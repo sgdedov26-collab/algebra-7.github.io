@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Математика - Выбор урока</title>
+    <title>Математика. 7 класс</title>
     <!-- Подключение иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -459,6 +459,42 @@
                 font-size: 1.8rem;
             }
         }
+
+        /* Стили для проверки существования уроков */
+        .lesson-check {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 122, 255, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary-blue);
+        }
+
+        .lesson-check h3 {
+            margin-bottom: 10px;
+            color: var(--primary-blue);
+        }
+
+        .existing-lessons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .lesson-link {
+            padding: 8px 15px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .lesson-link:hover {
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -544,6 +580,12 @@
 
         <!-- Сообщения -->
         <div id="messageContainer"></div>
+
+        <!-- Проверка существующих уроков -->
+        <div class="lesson-check" id="lessonCheck" style="display: none;">
+            <h3>Доступные уроки:</h3>
+            <div class="existing-lessons" id="existingLessons"></div>
+        </div>
     </div>
 
     <script>
@@ -564,6 +606,8 @@
         const lessonInput = document.getElementById('lessonNumber');
         const goToLessonBtn = document.getElementById('goToLessonBtn');
         const messageContainer = document.getElementById('messageContainer');
+        const lessonCheck = document.getElementById('lessonCheck');
+        const existingLessons = document.getElementById('existingLessons');
 
         // Переменные для хранения выбранных значений
         let selectedSubject = null;
@@ -586,6 +630,7 @@
                 setTimeout(() => {
                     authOverlay.style.display = 'none';
                     mainContent.classList.remove('content-hidden');
+                    checkExistingLessons();
                 }, 1000);
             } else {
                 // Неправильные данные
@@ -624,6 +669,9 @@
                 
                 // Показываем сообщение о выборе
                 showMessage(`Выбран предмет: ${getSubjectName(selectedSubject)}`, 'success');
+                
+                // Обновляем список доступных уроков
+                checkExistingLessons();
             });
         });
 
@@ -654,8 +702,52 @@
                 
                 // Пытаемся перейти к уроку
                 window.location.href = lessonPath;
+                
+                // Если страница не найдена, показываем сообщение через 2 секунды
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        showMessage('Урок не найден. Проверьте, существует ли такой урок.', 'error');
+                    }
+                }, 2000);
             }
         });
+
+        // Функция для проверки существующих уроков
+        async function checkExistingLessons() {
+            if (!selectedSubject) return;
+            
+            lessonCheck.style.display = 'block';
+            existingLessons.innerHTML = '<p>Проверка доступных уроков...</p>';
+            
+            const availableLessons = [];
+            const subjectFolder = getSubjectFolder(selectedSubject);
+            
+            // Проверяем первые 10 уроков
+            for (let i = 1; i <= 10; i++) {
+                const lessonNum = formatLessonNumber(i);
+                const lessonUrl = `Lessons/${subjectFolder}/Lesson${lessonNum}/Lesson${lessonNum}.html`;
+                
+                try {
+                    const response = await fetch(lessonUrl, { method: 'HEAD' });
+                    if (response.ok) {
+                        availableLessons.push(i);
+                    }
+                } catch (error) {
+                    // Продолжаем проверку
+                }
+            }
+            
+            // Отображаем найденные уроки
+            if (availableLessons.length > 0) {
+                existingLessons.innerHTML = availableLessons.map(lesson => 
+                    `<a href="Lessons/${subjectFolder}/Lesson${formatLessonNumber(lesson)}/Lesson${formatLessonNumber(lesson)}.html" class="lesson-link">
+                        Урок ${lesson}
+                    </a>`
+                ).join('');
+            } else {
+                existingLessons.innerHTML = '<p>Уроки не найдены. Убедитесь, что папки и файлы созданы правильно.</p>';
+            }
+        }
 
         // Функция для обновления состояния кнопки перехода
         function updateGoButtonState() {
