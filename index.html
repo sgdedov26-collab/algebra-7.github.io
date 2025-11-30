@@ -278,6 +278,119 @@
             display: block;
         }
 
+        /* Стили для модального окна авторизации */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .auth-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow-medium);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .auth-container h2 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .auth-container h2::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--accent-purple));
+            border-radius: 3px;
+        }
+
+        .auth-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(175, 82, 222, 0.2);
+        }
+
+        .form-input.error {
+            border-color: var(--accent-red);
+        }
+
+        .auth-message {
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            display: none;
+        }
+
+        .auth-message.error {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            display: block;
+        }
+
+        .auth-info {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Стили для скрытого контента */
+        .content-hidden {
+            display: none;
+        }
+
         /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -337,11 +450,50 @@
                 font-size: 1.1rem;
                 padding: 10px 20px;
             }
+            
+            .auth-container {
+                padding: 25px;
+            }
+            
+            .auth-container h2 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Модальное окно авторизации -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-container">
+            <div class="auth-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Авторизация</h2>
+            <p>Для доступа к материалам введите логин и пароль</p>
+            
+            <form class="auth-form" id="authForm">
+                <div class="form-group">
+                    <label for="login">Логин:</label>
+                    <input type="text" id="login" class="form-input" placeholder="Введите логин" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" class="form-input" placeholder="Введите пароль" required>
+                </div>
+                
+                <div id="authMessage" class="auth-message"></div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+            
+            </div>
+    </div>
+
+    <!-- Основной контент (скрыт до авторизации) -->
+    <div class="container content-hidden" id="mainContent">
         <!-- Заголовок страницы -->
         <header class="page-header">
             <h1>Математика - Выбор урока</h1>
@@ -395,15 +547,65 @@
     </div>
 
     <script>
-        // Переменные для хранения выбранных значений
-        let selectedSubject = null;
-        let lessonNumber = null;
+        // Константы для авторизации
+        const CORRECT_LOGIN = 'stpku';
+        const CORRECT_PASSWORD = 'stpku';
 
-        // Элементы DOM
+        // Элементы DOM для авторизации
+        const authOverlay = document.getElementById('authOverlay');
+        const authForm = document.getElementById('authForm');
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        const authMessage = document.getElementById('authMessage');
+        const mainContent = document.getElementById('mainContent');
+
+        // Элементы DOM для основной страницы
         const subjectCards = document.querySelectorAll('.subject-card');
         const lessonInput = document.getElementById('lessonNumber');
         const goToLessonBtn = document.getElementById('goToLessonBtn');
         const messageContainer = document.getElementById('messageContainer');
+
+        // Переменные для хранения выбранных значений
+        let selectedSubject = null;
+        let lessonNumber = null;
+
+        // Обработчик отправки формы авторизации
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Проверяем логин и пароль
+            if (login === CORRECT_LOGIN && password === CORRECT_PASSWORD) {
+                // Успешная авторизация
+                authMessage.textContent = 'Успешный вход!';
+                authMessage.className = 'auth-message success';
+                
+                // Скрываем окно авторизации и показываем основной контент
+                setTimeout(() => {
+                    authOverlay.style.display = 'none';
+                    mainContent.classList.remove('content-hidden');
+                }, 1000);
+            } else {
+                // Неправильные данные
+                authMessage.textContent = 'Неверный логин или пароль!';
+                authMessage.className = 'auth-message error';
+                
+                // Подсвечиваем неправильные поля
+                if (login !== CORRECT_LOGIN) {
+                    loginInput.classList.add('error');
+                } else {
+                    loginInput.classList.remove('error');
+                }
+                
+                if (password !== CORRECT_PASSWORD) {
+                    passwordInput.classList.add('error');
+                } else {
+                    passwordInput.classList.remove('error');
+                }
+            }
+        });
 
         // Обработчики событий для выбора предмета
         subjectCards.forEach(card => {
