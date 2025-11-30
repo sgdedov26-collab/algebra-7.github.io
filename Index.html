@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математика - Выбор урока</title>
+    <!-- Подключение иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Основные стили страницы */
+        :root {
+            --primary-blue: #007AFF;
+            --secondary-blue: #5AC8FA;
+            --accent-purple: #AF52DE;
+            --accent-orange: #FF9500;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
+            --background-light: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --border-radius: 14px;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+        }
+
+        body {
+            background: var(--background-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            font-size: 19px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Стили для заголовка страницы */
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-purple));
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Стили для карточек предметов */
+        .subjects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--primary-blue);
+        }
+
+        .subject-card.selected {
+            border-color: var(--accent-purple);
+            background: linear-gradient(135deg, rgba(175, 82, 222, 0.05), rgba(0, 122, 255, 0.05));
+        }
+
+        .subject-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+        }
+
+        .subject-card.selected .subject-icon {
+            color: var(--accent-purple);
+        }
+
+        .subject-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .subject-card p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Стили для выбора номера урока */
+        .lesson-selection {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .lesson-selection h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .lesson-selection h2::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--accent-purple));
+            border-radius: 3px;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .lesson-input {
+            padding: 12px 20px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+            width: 120px;
+            text-align: center;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .lesson-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(175, 82, 222, 0.2);
+        }
+
+        .lesson-info {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Стили для кнопок */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            margin: 8px;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.2rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover::before {
+            left: -100%;
+        }
+
+        /* Стили для сообщений */
+        .message {
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.error {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            display: block;
+        }
+
+        .message.success {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            display: block;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            body {
+                font-size: 17px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .page-header p {
+                font-size: 1.1rem;
+            }
+            
+            .subjects-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .subject-card {
+                padding: 20px;
+            }
+            
+            .lesson-selection {
+                padding: 20px;
+            }
+            
+            .lesson-selection h2 {
+                font-size: 1.7rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                font-size: 1.1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок страницы -->
+        <header class="page-header">
+            <h1>Математика - Выбор урока</h1>
+            <p>Выберите предмет и номер урока для перехода к учебным материалам</p>
+        </header>
+
+        <!-- Выбор предмета -->
+        <div class="subjects-container">
+            <div class="subject-card" data-subject="algebra">
+                <div class="subject-icon">
+                    <i class="fas fa-square-root-alt"></i>
+                </div>
+                <h2>Алгебра</h2>
+                <p>Изучение алгебраических выражений, уравнений и функций</p>
+            </div>
+            
+            <div class="subject-card" data-subject="geometria">
+                <div class="subject-icon">
+                    <i class="fas fa-draw-polygon"></i>
+                </div>
+                <h2>Геометрия</h2>
+                <p>Изучение геометрических фигур, их свойств и измерений</p>
+            </div>
+            
+            <div class="subject-card" data-subject="vis">
+                <div class="subject-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2>Вероятность и статистика</h2>
+                <p>Анализ данных, вероятности и статистические закономерности</p>
+            </div>
+        </div>
+
+        <!-- Выбор номера урока -->
+        <div class="lesson-selection">
+            <h2>Выбор номера урока</h2>
+            <div class="input-group">
+                <label for="lessonNumber">Номер урока:</label>
+                <input type="number" id="lessonNumber" class="lesson-input" min="1" max="999" placeholder="1">
+                <button id="goToLessonBtn" class="btn" disabled>
+                    <i class="fas fa-arrow-right"></i> Перейти к уроку
+                </button>
+            </div>
+            <div class="lesson-info">
+                Введите номер урока от 1 до 999
+            </div>
+        </div>
+
+        <!-- Сообщения -->
+        <div id="messageContainer"></div>
+    </div>
+
+    <script>
+        // Переменные для хранения выбранных значений
+        let selectedSubject = null;
+        let lessonNumber = null;
+
+        // Элементы DOM
+        const subjectCards = document.querySelectorAll('.subject-card');
+        const lessonInput = document.getElementById('lessonNumber');
+        const goToLessonBtn = document.getElementById('goToLessonBtn');
+        const messageContainer = document.getElementById('messageContainer');
+
+        // Обработчики событий для выбора предмета
+        subjectCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Снимаем выделение со всех карточек
+                subjectCards.forEach(c => c.classList.remove('selected'));
+                
+                // Выделяем выбранную карточку
+                this.classList.add('selected');
+                
+                // Сохраняем выбранный предмет
+                selectedSubject = this.dataset.subject;
+                
+                // Активируем кнопку, если номер урока уже введен
+                updateGoButtonState();
+                
+                // Показываем сообщение о выборе
+                showMessage(`Выбран предмет: ${getSubjectName(selectedSubject)}`, 'success');
+            });
+        });
+
+        // Обработчик события для ввода номера урока
+        lessonInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            
+            if (isNaN(value) || value < 1 || value > 999) {
+                lessonNumber = null;
+                showMessage('Пожалуйста, введите корректный номер урока от 1 до 999', 'error');
+            } else {
+                lessonNumber = value;
+                showMessage(`Выбран урок №${value}`, 'success');
+            }
+            
+            // Активируем кнопку, если предмет уже выбран
+            updateGoButtonState();
+        });
+
+        // Обработчик события для кнопки перехода к уроку
+        goToLessonBtn.addEventListener('click', function() {
+            if (selectedSubject && lessonNumber) {
+                // Формируем путь к уроку
+                const lessonPath = `Lessons/${getSubjectFolder(selectedSubject)}/Lesson${formatLessonNumber(lessonNumber)}/Lesson${formatLessonNumber(lessonNumber)}.html`;
+                
+                // Пытаемся перейти к уроку
+                window.location.href = lessonPath;
+                
+                // Если страница не найдена, показываем сообщение
+                setTimeout(() => {
+                    if (window.location.href.includes('Lesson')) {
+                        showMessage('Урок не найден. Проверьте правильность введенных данных.', 'error');
+                    }
+                }, 1000);
+            }
+        });
+
+        // Функция для обновления состояния кнопки перехода
+        function updateGoButtonState() {
+            if (selectedSubject && lessonNumber) {
+                goToLessonBtn.disabled = false;
+            } else {
+                goToLessonBtn.disabled = true;
+            }
+        }
+
+        // Функция для отображения сообщений
+        function showMessage(text, type) {
+            messageContainer.innerHTML = `<div class="message ${type}">${text}</div>`;
+            
+            // Автоматически скрываем сообщение через 3 секунды
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 3000);
+        }
+
+        // Функция для получения названия предмета
+        function getSubjectName(subjectCode) {
+            const subjects = {
+                'algebra': 'Алгебра',
+                'geometria': 'Геометрия',
+                'vis': 'Вероятность и статистика'
+            };
+            
+            return subjects[subjectCode] || 'Неизвестный предмет';
+        }
+
+        // Функция для получения названия папки предмета
+        function getSubjectFolder(subjectCode) {
+            const folders = {
+                'algebra': 'Algebra',
+                'geometria': 'Geometria',
+                'vis': 'ViS'
+            };
+            
+            return folders[subjectCode] || 'Unknown';
+        }
+
+        // Функция для форматирования номера урока (добавление ведущих нулей)
+        function formatLessonNumber(number) {
+            return number.toString().padStart(3, '0');
+        }
+    </script>
+</body>
+</html>
