@@ -649,15 +649,11 @@
                 // Формируем путь к уроку
                 const lessonPath = `Lessons/${getSubjectFolder(selectedSubject)}/Lesson${formatLessonNumber(lessonNumber)}/Lesson${formatLessonNumber(lessonNumber)}.html`;
                 
+                // Показываем сообщение о загрузке
+                showMessage(`Переход к уроку ${lessonNumber}...`, 'success');
+                
                 // Пытаемся перейти к уроку
                 window.location.href = lessonPath;
-                
-                // Если страница не найдена, показываем сообщение
-                setTimeout(() => {
-                    if (window.location.href.includes('Lesson')) {
-                        showMessage('Урок не найден. Проверьте правильность введенных данных.', 'error');
-                    }
-                }, 1000);
             }
         });
 
