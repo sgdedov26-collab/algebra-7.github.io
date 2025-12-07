@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наибольшее и наименьшее значение числового набора. Размах.</title>
+    <!-- Подключение CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Подключение иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Подключение MathJax для отображения математических формул -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок страницы -->
+        <header class="page-header">
+            <h1 id="lesson-title">Наибольшее и наименьшее значение числового набора. Размах.</h1>
+            </header>
+
+        <!-- Навигация по слайдам -->
+        <div class="slides-navigation" id="slides-nav">
+            <!-- Кружочки с номерами слайдов будут добавляться динамически -->
+        </div>
+
+        <!-- Рабочая область для контента слайдов -->
+        <main class="workspace" id="workspace">
+            <!-- Здесь будет отображаться содержимое активного слайда -->
+            <div class="content-block">
+                <h2>Добро пожаловать на урок!</h2>
+                <p>Для начала работы выберите один из слайдов выше.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Подключение JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
